@@ -3,73 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachable Machine Image Model</title>
+  <title>Teachable Machine Classifier</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
 </head>
 <body>
-  <main>
-    <h1 style="text-align: center;">Teachable Machine Image Model</h1>
-    <p style="text-align: center;">Real-time image classification using a webcam</p>
-  </main>
+  <h1>Teachable Machine Classifier</h1>
+  <p id="status">Loading model...</p>
   <script>
-    // Classifier Variable
     let classifier;
-    // Model URL
-    let imageModelURL = 'https://teachablemachine.withgoogle.com/models/XeQsWwLFe/';
-    
-    // Video
     let video;
-    let flippedVideo;
-    // To store the classification
-    let label = "";
+    let label = "Waiting...";
+    const modelURL = 'https://teachablemachine.withgoogle.com/models/XeQsWwLFe/';
 
-    // Load the model first
     function preload() {
-      classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+      classifier = ml5.imageClassifier(modelURL + 'model.json', () => {
+        document.getElementById("status").innerText = "Model loaded!";
+        classifyVideo();
+      });
     }
 
     function setup() {
-      // Create canvas and video capture
-      createCanvas(320, 260);
+      createCanvas(640, 480);
       video = createCapture(VIDEO);
-      video.size(320, 240);
+      video.size(640, 480);
       video.hide();
-
-      flippedVideo = ml5.flipImage(video);
-      classifyVideo();
     }
 
     function draw() {
-      background(0);
-      // Display the video
-      image(flippedVideo, 0, 0);
-
-      // Display the label
-      fill(255);
-      textSize(16);
-      textAlign(CENTER);
-      text(label, width / 2, height - 4);
+      background(220);
+      image(video, 0, 0);
+      textSize(32);
+      fill(0);
+      text(label, 10, height - 10);
     }
 
-    // Get a prediction for the current video frame
     function classifyVideo() {
-      flippedVideo = ml5.flipImage(video);
-      classifier.classify(flippedVideo, gotResult);
-      flippedVideo.remove();
-    }
-
-    // When we get a result
-    function gotResult(error, results) {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      label = results[0].label; // Update label with the highest confidence result
-      classifyVideo(); // Classify again
+      classifier.classify(video, (error, results) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        label = results[0].label;
+        classifyVideo(); // Classify the next frame
+      });
     }
   </script>
 </body>
 </html>
-.

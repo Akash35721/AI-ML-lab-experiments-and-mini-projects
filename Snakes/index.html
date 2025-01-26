@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Classification</title>
+</head>
+<body>
+    <h1>Snake Classification: Venomous vs Non-Venomous</h1>
+
+    <input type="file" id="imageUpload" accept="image/*">
+    <button type="button" onclick="submitImage()">Submit</button>
+    
+    <br><br>
+    <div id="prediction-result"></div>
+    <div id="status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    
+    <script>
+        const URL = "https://teachablemachine.withgoogle.com/models/hyvsF18ia/"; // Replace with your model URL
+        let model, maxPredictions, image;
+
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // Load the model and metadata
+            try {
+                document.getElementById("status").textContent = "Loading model...";
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+                document.getElementById("status").textContent = "Model loaded successfully!";
+                console.log("Model loaded successfully.");
+            } catch (error) {
+                console.error("Error loading the model:", error);
+                document.getElementById("status").textContent = "Error loading model.";
+            }
+        }
+
+        // Initialize the model when the page loads
+        window.onload = init;
+
+        function submitImage() {
+            const fileInput = document.getElementById("imageUpload");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                document.getElementById("status").textContent = "No file selected.";
+                console.log("No file selected.");
+                return;
+            }
+
+            const img = new Image();
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                img.src = e.target.result; // Set the image source to the uploaded file's data URL
+                console.log("Image loaded successfully.");
+                img.onload = () => {
+                    image = img;  // Store the image
+                    classifyImage();
+                };
+            };
+
+            reader.onerror = (e) => {
+                console.log("Error loading image:", e);
+                document.getElementById("status").textContent = "Error loading image.";
+            };
+
+            reader.readAsDataURL(file); // Read the image as data URL
+            document.getElementById("status").textContent = "Image uploaded, processing...";
+        }
+
+        async function classifyImage() {
+            if (!image) {
+                document.getElementById("status").textContent = "No image to classify.";
+                console.log("No image to classify.");
+                return;
+            }
+
+            document.getElementById("status").textContent = "Classifying image...";
+            console.log("Classifying image...");
+
+            // Create an HTML canvas element to render the image
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+
+            // Convert canvas image to Tensor
+            const tensor = tf.browser.fromPixels(canvas);
+            console.log("Tensor created from image.");
+
+            // Predict the image
+            try {
+                const prediction = await model.predict(tensor);
+                console.log("Prediction completed.");
+
+                document.getElementById("status").textContent = "Prediction completed.";
+                const resultContainer = document.getElementById("prediction-result");
+                resultContainer.innerHTML = "";  // Clear previous predictions
+
+                // Show predictions
+                for (let i = 0; i < maxPredictions; i++) {
+                    const classPrediction = `${prediction[i].className}: ${prediction[i].probability.toFixed(2)}`;
+                    const div = document.createElement("div");
+                    div.textContent = classPrediction;
+                    resultContainer.appendChild(div);
+                }
+            } catch (error) {
+                console.error("Error during prediction:", error);
+                document.getElementById("status").textContent = "Error during classification.";
+            }
+        }
+    </script>
+</body>
+</html>

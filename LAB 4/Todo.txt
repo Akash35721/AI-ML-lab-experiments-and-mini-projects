@@ -1,0 +1,49 @@
+
+------------------------
+tenagra 
+weka
+--------------------------
+chatpdf.com 
+
+
+univariate 
+bivariate 
+multivariate 
+
+
+
+cloud LLM 
+
+
+robotic process automation 
+OLTP : on time or previous records 
+// warehouse 
+3 types 
+slice and dice 
+roll up
+pivot  
+
+OLTP difference 
+
+MOLAP 
+ROLAP 
+HOLAP 
+
+
+
+fusion 
+training ratio 
+testing 
+validation accuracy 
+
+how to detect outliers and remove them 
+box plot 
+types of graphs 
+cborn and matplotlib // how many functions 
+
+
+OOLAM : summation value 
+
+
+3D and 2D 
+metadata in warehouse // uses and all 

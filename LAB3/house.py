@@ -39,12 +39,30 @@ print("\nModel Evaluation:")
 print(f"Mean Squared Error: {mse}")
 print(f"R-Squared Value: {r2}")
 
-# Step 8: Visualize Results
-plt.scatter(y_test, y_pred, alpha=0.5)
+
+
+# Improved Visualization of Actual vs Predicted Prices
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, alpha=0.5, color="blue", label="Predicted vs Actual")
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color="red", linestyle="dashed", linewidth=2, label="Ideal Fit")
 plt.xlabel("Actual Prices")
 plt.ylabel("Predicted Prices")
 plt.title("Actual vs Predicted House Prices")
+plt.legend()
+plt.grid(True)
 plt.show()
+
+# Residual Plot (Errors)
+residuals = y_test - y_pred
+plt.figure(figsize=(10, 6))
+plt.scatter(y_pred, residuals, alpha=0.5, color="purple")
+plt.axhline(y=0, color="red", linestyle="dashed", linewidth=2)
+plt.xlabel("Predicted Prices")
+plt.ylabel("Residuals (Errors)")
+plt.title("Residual Plot (Checking Errors)")
+plt.grid(True)
+plt.show()
+
 
 # Optional: Print model coefficients
 print("\nModel Coefficients:")
